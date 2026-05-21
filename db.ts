@@ -1,5 +1,5 @@
-// import Database from "better-sqlite3";
-// import mysql from 'mysql2/promise'
+import Database from 'better-sqlite3'
+import mysql from 'mysql2/promise'
 import pg from 'pg'
 import dotenv from 'dotenv'
 
@@ -35,24 +35,23 @@ if (isPostgres) {
       ssl: { rejectUnauthorized: false },
     })
   }
+} else if (isMySQL) {
+  console.log('Initializing MySQL database connection...')
+  pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'service_db',
+    port: Number(process.env.DB_PORT || 3306),
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    multipleStatements: true,
+  })
+} else {
+  console.log('Initializing SQLite database connection (fallback/default)...')
+  sqliteDb = new Database('database.sqlite')
 }
-// else if (isMySQL) {
-//   console.log('Initializing MySQL database connection...')
-//   pool = mysql.createPool({
-//     host: process.env.DB_HOST || 'localhost',
-//     user: process.env.DB_USER || 'root',
-//     password: process.env.DB_PASSWORD || '',
-//     database: process.env.DB_NAME || 'service_db',
-//     port: Number(process.env.DB_PORT || 3306),
-//     waitForConnections: true,
-//     connectionLimit: 10,
-//     queueLimit: 0,
-//     multipleStatements: true,
-//   })
-// } else {
-//   console.log('Initializing SQLite database connection (fallback/default)...')
-//   sqliteDb = new Database('database.sqlite')
-// }
 
 const camelKeysMap: Record<string, string> = {
   displayname: 'displayName',
