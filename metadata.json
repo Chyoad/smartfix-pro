@@ -1,0 +1,8 @@
+{
+  "name": "Remix: SmartFix Pro",
+  "description": "Comprehensive mini ERP for smartphone repairs featuring POS, inventory tracking, technician management, and automated professional accounting for modern shops.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": []
+}

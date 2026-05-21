@@ -1,0 +1,116 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "System user profiles with role-based access control.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "cashier", "technician"] },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Customer contact information and loyalty data.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "string" },
+        "loyaltyPoints": { "type": "number" },
+        "isVIP": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "phone"]
+    },
+    "ServiceTicket": {
+      "title": "Service Ticket",
+      "description": "Represents a single repair job lifecycle.",
+      "type": "object",
+      "properties": {
+        "customerId": { "type": "string" },
+        "deviceModel": { "type": "string" },
+        "imei": { "type": "string" },
+        "problem": { "type": "string" },
+        "diagnosis": { "type": "string" },
+        "status": { "type": "string", "enum": ["waiting", "checking", "on_progress", "pending_sparepart", "finished", "delivered", "cancel"] },
+        "technicianId": { "type": "string" },
+        "estimatedCost": { "type": "number" },
+        "finalCost": { "type": "number" },
+        "partsUsed": { "type": "array", "items": { "type": "object" } },
+        "conditionPhotos": { "type": "array", "items": { "type": "string" } },
+        "resultPhotos": { "type": "array", "items": { "type": "string" } },
+        "warrantyExpiry": { "type": "string", "format": "date-time" },
+        "repairHistory": { "type": "array", "items": { "type": "object" } },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["customerId", "deviceModel", "problem", "status"]
+    },
+    "InventoryItem": {
+      "title": "Inventory Item",
+      "description": "Spare parts or accessories in stock.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "sku": { "type": "string" },
+        "barcode": { "type": "string" },
+        "category": { "type": "string" },
+        "stockLevel": { "type": "number" },
+        "minStockAlert": { "type": "number" },
+        "buyPrice": { "type": "number" },
+        "sellPrice": { "type": "number" },
+        "warehouse": { "type": "string" },
+        "supplierId": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "sku", "stockLevel", "sellPrice"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Financial transaction for sales or service payments.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["sale", "service_payment", "refund"] },
+        "items": { "type": "array" },
+        "serviceId": { "type": "string" },
+        "customerId": { "type": "string" },
+        "totalAmount": { "type": "number" },
+        "discount": { "type": "number" },
+        "tax": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["cash", "transfer", "qris", "ewallet"] },
+        "cashierId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "totalAmount", "paymentMethod", "cashierId"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/customers/{customerId}": {
+      "schema": "Customer",
+      "description": "Customer database"
+    },
+    "/services/{serviceId}": {
+      "schema": "ServiceTicket",
+      "description": "Repair service tickets"
+    },
+    "/inventory/{itemId}": {
+      "schema": "InventoryItem",
+      "description": "Stock of parts and accessories"
+    },
+    "/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Sales and service transaction history"
+    }
+  }
+}

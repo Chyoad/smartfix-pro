@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        request.auth.token.email == 'ehodevdroid@gmail.com'
+      );
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Connectivity Test
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() || isOwner(userId);
+    }
+
+    // Customers
+    match /customers/{customerId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // Services
+    match /services/{serviceId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // Inventory
+    match /inventory/{itemId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && (isAdmin() || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'cashier');
+    }
+
+    // Transactions
+    match /transactions/{transactionId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+  }
+}
